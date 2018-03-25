@@ -8,16 +8,16 @@ import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import io.vlas.heartbeat.service.TransactionStatisticsService
-import scala.concurrent.duration._
 
 import scala.concurrent.ExecutionContext
+import scala.concurrent.duration._
 
-object StatisticsApp extends App with StatisticsApi  {
+object StatisticsApp extends App
+  with StatisticsApi with Context  {
 
   implicit val system: ActorSystem = ActorSystem()
   implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val ec: ExecutionContext = system.dispatcher
-
 
   val config = ConfigFactory.load()
 

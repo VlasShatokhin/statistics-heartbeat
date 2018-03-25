@@ -17,9 +17,9 @@ object Preaggregated {
 }
 
 case class Preaggregated(sum: Double,
-                                          max: Double,
-                                          min: Double,
-                                          count: Long) {
+                         max: Double,
+                         min: Double,
+                         count: Long) {
 
   def + (other: Preaggregated): Preaggregated =
     Preaggregated(

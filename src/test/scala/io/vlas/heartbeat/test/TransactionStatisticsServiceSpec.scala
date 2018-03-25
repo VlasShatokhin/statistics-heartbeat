@@ -3,11 +3,10 @@ package io.vlas.heartbeat.test
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit}
 import io.vlas.heartbeat.model.{Statistics, Transaction}
-import io.vlas.heartbeat.service.TransactionStatisticsService.{Created, GetStatistics, PostTransaction, TooOld}
+import io.vlas.heartbeat.service.TransactionStatisticsService.{Created, GetStatistics, PostTransaction, Rejected}
 import io.vlas.heartbeat.service.{Preaggregated, TransactionStatisticsService}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 
-import scala.collection.mutable
 import scala.concurrent.duration._
 
 object TransactionStatisticsServiceSpec {
@@ -18,6 +17,7 @@ object TransactionStatisticsServiceSpec {
 
   val postWithinTtlMillis: Long = apiPostTimeMillis - ttl.toMillis / 2
   val postAfterTtlTMillis: Long = apiPostTimeMillis - ttl.toMillis * 2
+  val futurePostMillis: Long = apiPostTimeMillis + ttl.toMillis
 
   val postWithinTtlSeconds: Long = postWithinTtlMillis / 1000
   val postAfterTtlSeconds: Long = postAfterTtlTMillis / 1000
@@ -38,7 +38,7 @@ class TransactionStatisticsServiceSpec extends TestKit(ActorSystem("TransactionS
   "TransactionStatisticsService" must {
 
 
-    "respond with 'Created' on transactions within TTL" in {
+    "create the record within TTL" in {
 
       val statisticsActor = system.actorOf(TransactionStatisticsService.props(ttl))
 
@@ -47,13 +47,22 @@ class TransactionStatisticsServiceSpec extends TestKit(ActorSystem("TransactionS
       expectMsg(Created)
     }
 
-    "respond with 'TooOld' on transaction after TTL" in {
+    "reject the record after TTL" in {
 
       val statisticsActor = system.actorOf(TransactionStatisticsService.props(ttl))
 
       statisticsActor ! PostTransaction(apiPostTimeMillis, Transaction(amount, postAfterTtlTMillis))
 
-      expectMsg(TooOld)
+      expectMsg(Rejected)
+    }
+
+    "reject the record with future timestamp" in {
+
+      val statisticsActor = system.actorOf(TransactionStatisticsService.props(ttl))
+
+      statisticsActor ! PostTransaction(apiPostTimeMillis, Transaction(amount, futurePostMillis))
+
+      expectMsg(Rejected)
     }
 
     "respond with empty stats if nothing was added" in {
@@ -89,7 +98,7 @@ class TransactionStatisticsServiceSpec extends TestKit(ActorSystem("TransactionS
 
     "return stats within the deadline" in {
 
-      val map: mutable.Map[Long, Preaggregated] = mutable.TreeMap(postAfterTtlSeconds -> Preaggregated(amount))
+      val map = Map(postAfterTtlSeconds -> Preaggregated(amount))
       val statisticsActor = system.actorOf(TransactionStatisticsService.props(ttl, map))
 
       statisticsActor ! PostTransaction(apiPostTimeMillis, Transaction(minAmount, postWithinTtlMillis))
