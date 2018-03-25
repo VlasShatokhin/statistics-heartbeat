@@ -3,7 +3,7 @@
 Calculates​ ​real time​ ​statistic​s ​from​ ​the​ ​last​ ​60​ ​seconds (configurable)
 
 ## API
-### Adding a record
+##### Adding a record
 Endpoint
 ```
 POST​ ​/transactions
@@ -15,6 +15,9 @@ Data
   ​"timestamp":​ ​1478192204000
 }
 ```
+Returns empty​ ​body​ ​with​ ​either​ ​201​ ​or​ ​204:
+* 201​ ​-​ ​in​ ​case​ ​of​ ​success
+* 204​ ​-​ ​if​ ​transaction​ ​is​ ​older​ ​than​ ​60​ ​seconds
 
 Example:
 ```bash
@@ -26,7 +29,7 @@ Date: Sun, 25 Mar 2018 05:43:57 GMT
 Server: akka-http/10.1.0
 ```
 
-### Getting statistics
+##### Getting statistics
 Endpoint
 ```
 GET​ ​/statistics
@@ -34,10 +37,10 @@ GET​ ​/statistics
 Returns
 ```json
 {
-  "sum":​ ​1000, ​
-  "avg":​ ​100, ​
-  "max":​ ​200, ​
-  "min":​ ​50, ​
+  "sum":​ ​1000,
+  "avg":​ ​100,
+  "max":​ ​200,​
+  "min":​ ​50,
   "count":​ ​10
 }
 ```

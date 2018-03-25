@@ -2,12 +2,12 @@ package io.vlas.heartbeat.service
 
 import io.vlas.heartbeat.model.Statistics
 
-object Preaggregated {
+private[service] object Preaggregated {
 
   def apply(amount: Double): Preaggregated =
     Preaggregated(sum = amount, max = amount, min = amount, count = 1)
 
-  def toTransactionStatistics(preaggregated: Preaggregated): Statistics =
+  def toStatistics(preaggregated: Preaggregated): Statistics =
     Statistics(
       sum = preaggregated.sum,
       avg = if (preaggregated.count > 0) preaggregated.sum / preaggregated.count else 0,
@@ -16,10 +16,10 @@ object Preaggregated {
       count = preaggregated.count)
 }
 
-case class Preaggregated(sum: Double,
-                         max: Double,
-                         min: Double,
-                         count: Long) {
+private[service] case class Preaggregated(sum: Double,
+                                          max: Double,
+                                          min: Double,
+                                          count: Long) {
 
   def + (other: Preaggregated): Preaggregated =
     Preaggregated(
@@ -33,7 +33,6 @@ case class Preaggregated(sum: Double,
       sum = sum + amount,
       max = Math.max(amount, max),
       min = Math.min(amount, min),
-      count = count + 1
-    )
+      count = count + 1)
 
 }

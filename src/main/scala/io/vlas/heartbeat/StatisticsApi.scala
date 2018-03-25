@@ -6,7 +6,7 @@ import akka.http.scaladsl.server.{Directives, Route}
 import akka.pattern.ask
 import io.vlas.heartbeat.marshalling.JsonSupport
 import io.vlas.heartbeat.model.{Statistics, Transaction}
-import io.vlas.heartbeat.service.TransactionStatisticsService.{Created, GetStatistics, PostTransaction, Rejected}
+import io.vlas.heartbeat.service.StatisticsService.{Created, GetStatistics, PostTransaction, Rejected}
 
 trait StatisticsApi extends Directives with JsonSupport {
   this: Context =>

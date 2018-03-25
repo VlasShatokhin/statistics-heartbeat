@@ -7,9 +7,8 @@ import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import io.vlas.heartbeat.service.TransactionStatisticsService
+import io.vlas.heartbeat.service.StatisticsService
 
-import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
 object StatisticsApp extends App
@@ -17,12 +16,11 @@ object StatisticsApp extends App
 
   implicit val system: ActorSystem = ActorSystem()
   implicit val materializer: ActorMaterializer = ActorMaterializer()
-  implicit val ec: ExecutionContext = system.dispatcher
 
   val config = ConfigFactory.load()
 
   val recordTtl: Duration = Duration.fromNanos(config.getDuration("statistics.ttl").toNanos)
-  val statisticsActor = system.actorOf(TransactionStatisticsService.props(recordTtl))
+  val statisticsActor = system.actorOf(StatisticsService.props(recordTtl))
 
   implicit val timeout: Timeout  = Timeout(config.getDuration("http.timeout").getSeconds, TimeUnit.SECONDS)
 

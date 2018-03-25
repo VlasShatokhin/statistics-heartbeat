@@ -10,7 +10,7 @@ trait Context {
 
   implicit def system: ActorSystem
   implicit def materializer: ActorMaterializer
-  implicit def ec: ExecutionContext
+  implicit def ec: ExecutionContext = system.dispatcher
   implicit def timeout: Timeout
 
 }
